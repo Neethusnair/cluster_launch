@@ -1,0 +1,81 @@
+name: Set up SSL
+
+on:
+ workflow_dispatch
+  # push:
+  #   branches:
+  #   - main
+
+env:
+  EKS_CLUSTER: launch
+  EKS_REGION: us-east-2
+
+jobs:
+  Job1:
+    name: Setup ssl
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    ## AWS Credentials
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.EKS_REGION }}
+
+    # Get the EKS credentials so we can deploy to the cluster
+    - run: |-
+        aws eks --region $EKS_REGION update-kubeconfig --name $EKS_CLUSTER
+        
+   # Set up cert-manager
+    - name: Set up cert-manager
+      run: |-
+       kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml      
+       kubectl wait --for=condition=ready pod -n cert-manager -l app=webhook
+       kubectl get pod -n cert-manager
+
+   # create secret for ssl
+    - name: create secret
+      env:
+        API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      run: |
+        kubectl delete secret ssl-secret -n cert-manager --ignore-not-found 
+        kubectl create secret generic ssl-secret -n cert-manager --from-literal=api-token=$API_TOKEN
+        kubectl get secrets -n cert-manager ssl-secret -o yaml 
+
+  # Isssuer and certificate
+    - name: Apply Isssuer and Certificate
+      run: |
+        kubectl apply -f issuer.yaml
+        kubectl apply -f certificate.yaml
+        kubectl get certificate -A       
+
+
+  Job2:
+    needs: Job1
+    name: Deploy Gateway
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+   # AWS Credentials
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.EKS_REGION }}
+        
+   # Get the EKS credentials so we can deploy to the cluster
+    - run: |-
+        aws eks --region $EKS_REGION update-kubeconfig --name $EKS_CLUSTER
+
+   # Deploy gateway and virtual services
+    - name: Deploy gateway
+      run: |-
+        kubectl apply -f gateway.yaml
+        kubectl get svc -l=istio=ingressgateway -n istio-system                     

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ssl-certificate
+  namespace: istio-system
+spec:
+  commonName: '*.managedorg.io'
+  dnsNames:
+  - '*.managedorg.io'
+  issuerRef:
+    kind: ClusterIssuer
+    name: ssl-issuer
+  secretName: cert-ssl-secret
