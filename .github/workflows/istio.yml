@@ -33,10 +33,10 @@ jobs:
    # Set up istio
     - name: Set up Istio
       run: |-
-       curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.7.3 sh -
-       cd istio-1.7.3
+       curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.16.0 sh -
+       cd istio-1.16.0
        export PATH=$PWD/bin:$PATH
-       istioctl install --set profile=demo
+       istioctl install --set profile=demo -y
        cd ~
        #kubectl label namespace default istio-injection=enabled 
        kubectl label namespace default istio-injection=enabled --overwrite
