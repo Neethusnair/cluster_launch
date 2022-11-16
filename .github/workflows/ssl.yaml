@@ -78,4 +78,9 @@ jobs:
     - name: Deploy gateway
       run: |-
         kubectl apply -f gateway.yaml
-        kubectl get svc -l=istio=ingressgateway -n istio-system                     
+        kubectl get svc -l=istio=ingressgateway -n istio-system      
+
+   # Install Metric Server
+    - name: Install metric server
+      run: |-
+        kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml                         
