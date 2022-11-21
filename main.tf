@@ -140,7 +140,7 @@ module "eks" {
     attach_cluster_primary_security_group = true
 
     node_security_group_tags = {
-      "kubernetes.io/cluster/${var.name}" = null
+      "kubernetes.io/cluster/${var.cluster_name}" = null
     }
 
     # Disabling and using externally provided security groups
