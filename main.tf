@@ -138,6 +138,10 @@ module "eks" {
     ami_type = "AL2_x86_64"
 
     attach_cluster_primary_security_group = true
+    
+    node_security_group_tags = {
+      "kubernetes.io/cluster/${var.name}" = null
+    }
 
     # Disabling and using externally provided security groups
     create_security_group = false
