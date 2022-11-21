@@ -161,6 +161,10 @@ module "eks" {
       echo 'foo bar'
       EOT
 
+      node_security_group_tags = {
+        "kubernetes.io/cluster/${var.cluster_name}" = null
+      }
+
       vpc_security_group_ids = [
         aws_security_group.node_group_one.id
       ]
