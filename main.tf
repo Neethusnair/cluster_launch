@@ -143,9 +143,9 @@ module "eks" {
 
     attach_cluster_primary_security_group = true
 
-    node_security_group_tags = {
-      "kubernetes.io/cluster/${var.cluster_name}" = null
-    }
+    # node_security_group_tags = {
+    #   "kubernetes.io/cluster/${var.cluster_name}" = null
+    # }
 
     # Disabling and using externally provided security groups
     create_security_group = false
@@ -165,9 +165,9 @@ module "eks" {
       echo 'foo bar'
       EOT
 
-      node_security_group_tags = {
-        "kubernetes.io/cluster/${var.cluster_name}" = null
-      }
+      # node_security_group_tags = {
+      #   "kubernetes.io/cluster/${var.cluster_name}" = null
+      # }
 
       vpc_security_group_ids = [
         aws_security_group.node_group_one.id
