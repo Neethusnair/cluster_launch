@@ -27,10 +27,10 @@ terraform {
   }
 
   backend "remote" {
-    organization = "sreyo23"
+    organization = "SREYO"
 
     workspaces {
-      name = "new-config-eks"
+      name = "scale-test-cluster"
     }
   }
   #required_version = "~> 1.3"
