@@ -6,7 +6,7 @@ on:
     - main
 
 env:
-  EKS_CLUSTER: launch
+  EKS_CLUSTER: scale-test
   EKS_REGION: us-east-2
 
 jobs:
